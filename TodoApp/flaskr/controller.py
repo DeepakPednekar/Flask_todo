@@ -1,19 +1,19 @@
 from flask import Blueprint, jsonify, request, current_app
 from . import extension
 from . import models
-from .extension import db, log
+from .extension import db, get_logger
+import logging
 
-log = None
 user_bp = Blueprint('user', __name__, url_prefix='/user') 
 
 def user_root():
-    log.info('user_root | request | %s', request)
     if request.method.lower() == 'get':
         data = models.User.query.all()
-        d = {'msg': 'Operation Successful GET', 'type':'+OK'}
+        data = [each.get_json() for each in data]
+        d = {'msg': 'Operation Successful GET', 'type':'+OK', 'return': data}
         return  jsonify(d), 200
     _json = request.get_json() 
-    print('json', _json)
+
     if not _json:
         d = {'type':'-ERR', 'msg':'json not found'}
         return jsonify(d), 404
@@ -22,8 +22,10 @@ def user_root():
         d = {'type':'-ERR', 'msg':'username or email not found'}
         return jsonify(d), 404
 
-    models.User(**_json)
+    user = models.User(**_json)
+    db.session.add(user)
     db.session.commit()
+    data = models.User.query.all()
     d = {'msg': 'Operation Successfull', 'type':'+OK'}
     return  jsonify(d), 200
 

@@ -8,3 +8,6 @@ class User(db.Model):
 
    def __repr__(self):
         return '<User {0}>'.format(self.username)
+        
+   def get_json(self):
+        return {'id': self.id, 'username': self.username, 'email': self.email}
