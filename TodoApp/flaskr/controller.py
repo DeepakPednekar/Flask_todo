@@ -13,40 +13,19 @@ log.setLevel(logging.DEBUG)
 
 user_bp = Blueprint('user', __name__, url_prefix='/user') 
 
-@user_bp.route('', methods=['GET','POST'])
+@user_bp.route('', methods=['GET'])
 @jwt_required()
 def user_root():
-    if request.method.lower() == 'get':
-        data = models.User.query.all()
-        data = [each.get_json() for each in data]
-        d = {'msg': 'Operation Successful GET', 'type':'+OK', 'return': data}
-        return  jsonify(d), 200
-    _json = request.get_json() 
+    userid = request.args.get('id')
+    if userid:
+        data = models.User.query.filter_by(id=userid).first()
+        data = data.get_json() if isinstance(data, models.User) else {}
+        status = 1 if data else 0
+        return extension.sendResponse(data=data, status=status)
 
-    if not _json:
-        d = {'type':'-ERR', 'msg':'json not found'}
-        return jsonify(d), 404
-
-    if 'username' not in _json.keys() or 'email' not in _json.keys():
-        d = {'type':'-ERR', 'msg':'username or email not found'}
-        return jsonify(d), 404
-
-    _json['password'] = _sha1.sha1(_json.get('password').encode('utf-8')).hexdigest()[:12] 
-    print(_json)
-    user = models.User(**_json)
-    db.session.add(user)
-    db.session.commit()
     data = models.User.query.all()
-    d = {'msg': 'Operation Successfull', 'type':'+OK'}
-    return  jsonify(d), 200
-
-def sendResponse(success=False, msg=''):
-    d = {}
-    d['msg'] = msg
-    code = 401
-    if success:
-        code=200
-    return jsonify(d) 
+    data = [each.get_json() for each in data]
+    return extension.sendResponse(data=data, status=0)
 
 @user_bp.route('test')
 def test():
@@ -55,4 +34,21 @@ def test():
     d = {'msg': 'Operation Successfull', 'type':'+OK'}
     return  jsonify(d), 200
 
-#user_bp.add_url_rule('', '', user_root, methods=('GET', 'POST'))
+@user_bp.route('register', methods=['POST'])
+def register():
+    ## check fields
+    _json = request.get_json()
+    if not _json:
+        return extension.sendResponse(msg='Json not found', status=0)
+
+    keys = _json.keys() 
+    for each in ['email', 'name', 'password', 'username']:
+        if each not in keys:
+            return extension.sendResponse(msg='Keys not found', status=0)
+
+    _json['password'] = _sha1.sha1(_json.get('password').encode('utf-8')).hexdigest()[:12] 
+    user = models.User(**_json)
+    db.session.add(user)
+    db.session.commit()
+    data = models.User.query.all()
+    return extension.sendResponse(status=1)

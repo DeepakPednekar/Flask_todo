@@ -19,6 +19,7 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['DEBUG']=True
     app.config['SECRET_KEY']=sha1(b'for test').hexdigest()
+    app.config['JWT_LEEWAY']=216000
 
     try:
         os.makedirs(app.instance_path)
