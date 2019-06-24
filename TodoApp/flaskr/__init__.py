@@ -9,6 +9,7 @@ from flask_jwt import JWT
 from .extension import db, log
 from . import models
 from . import controller
+from .todo.urls import bp_todo
 
 
 def create_app(test_config=None):
@@ -44,6 +45,7 @@ def create_app(test_config=None):
 
     with app.app_context():
         app.register_blueprint(controller.user_bp)
+        app.register_blueprint(bp_todo)
         db.init_app(app)
         db.create_all()
         JWT(app, authenticate, identity)
