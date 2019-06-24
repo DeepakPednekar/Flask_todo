@@ -1,11 +1,16 @@
 from flask import Blueprint, jsonify, request, current_app
 from . import extension
 from . import models
-from .extension import db, get_logger
+from .extension import db
 import logging
+import _sha1
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 user_bp = Blueprint('user', __name__, url_prefix='/user') 
 
+@user_bp.route('', methods=['GET','POST'])
 def user_root():
     if request.method.lower() == 'get':
         data = models.User.query.all()
@@ -22,6 +27,8 @@ def user_root():
         d = {'type':'-ERR', 'msg':'username or email not found'}
         return jsonify(d), 404
 
+    _json['password'] = _sha1.sha1(_json.get('password').encode('utf-8')).hexdigest()[:12] 
+    print(_json)
     user = models.User(**_json)
     db.session.add(user)
     db.session.commit()
@@ -37,4 +44,11 @@ def sendResponse(success=False, msg=''):
         code=200
     return jsonify(d) 
 
-user_bp.add_url_rule('', '', user_root, methods=('GET', 'POST'))
+@user_bp.route('test')
+def test():
+    log.debug('this is test request ')
+    print('controller | ', id(log))
+    d = {'msg': 'Operation Successfull', 'type':'+OK'}
+    return  jsonify(d), 200
+
+#user_bp.add_url_rule('', '', user_root, methods=('GET', 'POST'))
