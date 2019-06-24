@@ -1,7 +1,10 @@
+from flask_jwt import jwt_required
 from flask import Blueprint, jsonify, request, current_app
 from . import extension
+
 from . import models
 from .extension import db
+
 import logging
 import _sha1
 
@@ -11,6 +14,7 @@ log.setLevel(logging.DEBUG)
 user_bp = Blueprint('user', __name__, url_prefix='/user') 
 
 @user_bp.route('', methods=['GET','POST'])
+@jwt_required()
 def user_root():
     if request.method.lower() == 'get':
         data = models.User.query.all()
