@@ -1,8 +1,8 @@
 from flaskr.extension import sendResponse
+from .models import *
 
 def root():
-    ## in this view return all the todo items
-    return sendResponse(msg="its root", status=1)
+    data = TodoItem.query.all()
+    data = [each.get_json() for each in data] if data else []
+    return sendResponse(data=data, status=1)
 
-def test():
-    return sendResponse(status=1)
