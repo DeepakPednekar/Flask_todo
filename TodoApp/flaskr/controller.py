@@ -25,7 +25,7 @@ def user_root():
 
     data = models.User.query.all()
     data = [each.get_json() for each in data]
-    return extension.sendResponse(data=data, status=0)
+    return extension.sendResponse(data=data, status=1)
 
 @user_bp.route('test')
 def test():

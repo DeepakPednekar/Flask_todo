@@ -34,6 +34,8 @@ def create_app(test_config=None):
 
     def authenticate(username, password):
         user = models.User.query.filter_by(username=username).first()
+        if not user:
+            return 
         if user.password == sha1(password.encode('utf-8')).hexdigest()[:12]:
             return user
         else:
@@ -41,7 +43,10 @@ def create_app(test_config=None):
 
     def identity(payload):
         _id = payload['identity']
-        return models.User.query.filter_by(id=_id)
+        user = models.User.query.filter_by(id=_id).first()
+        # return models.User.query.filter_by(id=_id)
+        # print('user | ', user, type(user))
+        return user
 
     with app.app_context():
         app.register_blueprint(controller.user_bp)

@@ -4,10 +4,10 @@ from .todo.models import *
 
 class User(db.Model):
    id = db.Column(db.Integer, primary_key=True)
-   name = db.Column(db.String(20), nullable=True, default='')
-   username = db.Column(db.String(80), nullable=False)
+   name = db.Column(db.String(20), nullable=False, default='')
+   username = db.Column(db.String(80), nullable=False, index=True)
    email = db.Column(db.String(80), nullable=False)
-   password = db.Column(db.String(20))
+   password = db.Column(db.String(20), nullable=False)
    todo = db.relationship('Todo', backref='user', lazy=True)
 
    def __repr__(self):

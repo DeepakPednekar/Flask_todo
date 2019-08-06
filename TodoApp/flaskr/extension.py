@@ -26,8 +26,7 @@ def sendResponse(msg="", data={}, **kwargs):
         _data['code'] = 501
         _data['type'] = "-ERR"
 
-    if data:
-        _data['return'] = data
+    _data['return'] = data
 
     response = make_response(json.dumps(_data))
     response.headers['Content-Type'] = 'application/json'
