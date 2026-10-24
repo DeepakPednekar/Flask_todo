@@ -6,8 +6,9 @@ from .extension import db, log
 
 from . import controller
 
-def create_app(test_config=None):
-    app = Flask(__name__)
+app = Flask(__name__)
+
+def create_app(test_config=None, *args, **kwargs):
     db_url = os.path.join(app.instance_path, 'flaskr.sqlite')
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flaskr.sqlite'

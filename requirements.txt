@@ -1,0 +1,4 @@
+SQLAlchemy==2.0.51
+flask
+Flask-BasicAuth
+Flask-SQLAlchemy==3.1.1
